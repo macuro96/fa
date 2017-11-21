@@ -9,6 +9,8 @@
             require_once "auxiliar.php";
 
             $bInsercionCorrecta = false;
+            $rowGenero          = null;
+
             $titulo = $anyo = $sipnosis = $duracion = $genero = '';
 
             if (!empty($_POST)){
@@ -23,45 +25,47 @@
                 $stmGenero     = $aResultadoSQLGenero['salida'];
                 $bSelectGenero = $aResultadoSQLGenero['success'];
 
-                $row = null;
-
-                if ($bSelectGenero):
-                    $row = $stmGenero->fetchObject();
-
-                else:
-
-                endif;
+                if ($bSelectGenero){
+                    $rowGenero          = $stmGenero->fetchObject();
+                    $bInsercionCorrecta = ($rowGenero == true);
+                    
+                } // if ($bSelectGenero)
 
             } // if (!empty($_POST))
 
         ?>
 
-        <form action="<?= (!$bInsercionCorrecta ? 'insertar.php' : 'hacer_borrado.php') ?>" method="post">
+        <form action="<?= (!$bInsercionCorrecta ? 'insertar.php' : 'hacer_insercion.php') ?>" method="post">
             <label for="titulo">Título:*</label>
             <br>
-            <input id="titulo" name="titulo" value="<?= $titulo ?>" type="text">
+            <input <?= ($bInsercionCorrecta ? 'disabled' : '') ?> id="titulo" name="titulo" value="<?= $titulo ?>" type="text">
             <br>
             <label for="anyo">Año:</label>
             <br>
-            <input id="anyo" name="anyo" type="number" value="<?= $anyo ?>">
+            <input <?= ($bInsercionCorrecta ? 'disabled' : '') ?> id="anyo" name="anyo" type="number" value="<?= $anyo ?>">
             <br>
             <label for="sipnosis">Sipnosis:</label>
             <br>
-            <textarea id="sipnosis" name="sipnosis" value="<?= $sipnosis ?>"></textarea>
+            <textarea <?= ($bInsercionCorrecta ? 'disabled' : '') ?> id="sipnosis" name="sipnosis" value="<?= $sipnosis ?>"></textarea>
             <br>
             <label for="duracion">Duración:</label>
             <br>
-            <input id="duracion" name="duracion" value="<?= $duracion ?>" type="number">
+            <input <?= ($bInsercionCorrecta ? 'disabled' : '') ?> id="duracion" name="duracion" value="<?= $duracion ?>" type="number">
             <br>
             <label for="genero">Género:*</label>
             <br>
-            <input id="genero" name="genero" value="<?= $genero ?>" type="text">
+            <input <?= ($bInsercionCorrecta ? 'disabled' : '') ?> id="genero" name="genero" value="<?= $genero ?>" type="text">
             <br>
             <br>
 
-            <input type="submit" value="Insertar película">
+            <input type="submit" value="<?= (!$bInsercionCorrecta ? 'Comprobar' : 'Insertar') . ' película' ?>">
 
         </form>
+
+        <?php
+        if (!empty($_POST) && $rowGenero == null && !$bInsercionCorrecta):?>
+            <h3>Los parámetros para la inserción no son correctos.</h3>
+        <?php endif; ?>
 
     </body>
 </html>

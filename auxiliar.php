@@ -1,6 +1,13 @@
 <?php
 require_once "db/dbConfig.php";
 
+
+function h($salida)
+{
+    htmlspecialchars($salida, ENT_QUOTES | ENT_SUBSTITUTE);
+}
+
+
 /**
  * Busca una pelicula dentro de la base de datos a partir de su ID
  * @param  int     $id          ID de la pelicula
