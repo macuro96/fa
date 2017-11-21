@@ -7,9 +7,9 @@ function h($salida)
     return htmlspecialchars($salida, ENT_QUOTES | ENT_SUBSTITUTE);
 }
 
-function convertirParametroDefault($parametro)
+function convertirParametroNull($parametro)
 {
-    return ($parametro != false ? $parametro : 'DEFAULT');
+    return ($parametro != false ? $parametro : null);
 } // function comprobarParametro($parametro)
 
 /**

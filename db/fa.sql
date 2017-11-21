@@ -22,6 +22,72 @@ CREATE TABLE "peliculas"
                                ON UPDATE CASCADE
 );
 
+-- Funciones
+
+-- InsertarPelicula (SIN REFACTORIZAR, PONER FOR)
+CREATE OR REPLACE FUNCTION "insertarPelicula"(titulo VARCHAR, sipnosis TEXT, anyo NUMERIC, duracion NUMERIC, genero_id BIGINT) RETURNS BOOLEAN
+AS $$
+DECLARE
+	bInsertar BOOLEAN;
+	sSipnosis TEXT;
+	iAnyo     NUMERIC;
+	iDuracion NUMERIC;
+
+	sSipnosisDefault TEXT;
+	iAnyoDefault     NUMERIC;
+	iDuracionDefault NUMERIC;
+
+BEGIN
+
+	bInsertar := FALSE;
+
+	SELECT d.adsrc AS default_value
+	INTO sSipnosisDefault
+	FROM   pg_catalog.pg_attribute a
+	LEFT   JOIN pg_catalog.pg_attrdef d ON (a.attrelid, a.attnum)
+					     = (d.adrelid,  d.adnum)
+	WHERE  NOT a.attisdropped
+	AND    a.attnum > 0
+	AND    a.attrelid = 'public.peliculas'::regclass
+	AND    a.attname = 'sipnosis';
+
+	SELECT d.adsrc AS default_value
+	INTO iAnyoDefault
+	FROM   pg_catalog.pg_attribute a
+	LEFT   JOIN pg_catalog.pg_attrdef d ON (a.attrelid, a.attnum)
+					     = (d.adrelid,  d.adnum)
+	WHERE  NOT a.attisdropped
+	AND    a.attnum > 0
+	AND    a.attrelid = 'public.peliculas'::regclass
+	AND    a.attname = 'anyo';
+
+	SELECT d.adsrc AS default_value
+	INTO iDuracionDefault
+	FROM   pg_catalog.pg_attribute a
+	LEFT   JOIN pg_catalog.pg_attrdef d ON (a.attrelid, a.attnum)
+					     = (d.adrelid,  d.adnum)
+	WHERE  NOT a.attisdropped
+	AND    a.attnum > 0
+	AND    a.attrelid = 'public.peliculas'::regclass
+	AND    a.attname = 'duracion';
+
+	sSipnosis := COALESCE(sipnosis, sSipnosisDefault);
+	iAnyo     := COALESCE(anyo, iAnyoDefault);
+	iDuracion := COALESCE(duracion, iDuracionDefault);
+
+	INSERT INTO "peliculas" (titulo, sipnosis, anyo, duracion, genero_id)
+			VALUES  (titulo, sSipnosis, iAnyo, iDuracion, genero_id);
+
+	IF FOUND THEN
+		bInsertar := TRUE;
+	END IF;
+
+	RETURN bInsertar;
+
+END;
+$$
+LANGUAGE plpgsql;
+
 -- INSERT
 
 DELETE FROM "generos";
