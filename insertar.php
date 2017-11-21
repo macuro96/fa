@@ -8,10 +8,12 @@
         <?php
             require_once "auxiliar.php";
 
-            $bInsercionCorrecta = false;
+            $bInsercionPosible = false;
             $rowGenero          = null;
 
-            $titulo = $anyo = $sipnosis = $duracion = $genero = '';
+            $error = null;
+
+            $titulo = $anyo = $sipnosis = $duracion = $genero = null;
 
             if (!empty($_POST)){
                 $titulo   = trim(filter_input(INPUT_POST, 'titulo'));
@@ -27,44 +29,75 @@
 
                 if ($bSelectGenero){
                     $rowGenero          = $stmGenero->fetchObject();
-                    $bInsercionCorrecta = ($rowGenero == true);
-                    
+                    $bInsercionPosible  = ($rowGenero == true);
+
+                    if ($bInsercionPosible){
+                        $generoId = $rowGenero->id;
+                    }
+
                 } // if ($bSelectGenero)
+
+                if (!$bInsercionPosible){
+                    $error = 'Los parámetros para la inserción no son correctos.';
+                } // if (!$bInsercionPosible)
 
             } // if (!empty($_POST))
 
         ?>
 
-        <form action="<?= (!$bInsercionCorrecta ? 'insertar.php' : 'hacer_insercion.php') ?>" method="post">
+        <form action="insertar.php" method="post">
             <label for="titulo">Título:*</label>
             <br>
-            <input <?= ($bInsercionCorrecta ? 'disabled' : '') ?> id="titulo" name="titulo" value="<?= $titulo ?>" type="text">
+            <input <?= ($bInsercionPosible ? 'disabled' : '') ?> id="titulo" name="titulo" value="<?= h($titulo) ?>" type="text">
             <br>
             <label for="anyo">Año:</label>
             <br>
-            <input <?= ($bInsercionCorrecta ? 'disabled' : '') ?> id="anyo" name="anyo" type="number" value="<?= $anyo ?>">
+            <input <?= ($bInsercionPosible ? 'disabled' : '') ?> id="anyo" name="anyo" type="number" value="<?= h($anyo) ?>">
             <br>
             <label for="sipnosis">Sipnosis:</label>
             <br>
-            <textarea <?= ($bInsercionCorrecta ? 'disabled' : '') ?> id="sipnosis" name="sipnosis" value="<?= $sipnosis ?>"></textarea>
+            <textarea <?= ($bInsercionPosible ? 'disabled' : '') ?> id="sipnosis" name="sipnosis" value="<?= h($sipnosis) ?>"></textarea>
             <br>
             <label for="duracion">Duración:</label>
             <br>
-            <input <?= ($bInsercionCorrecta ? 'disabled' : '') ?> id="duracion" name="duracion" value="<?= $duracion ?>" type="number">
+            <input <?= ($bInsercionPosible ? 'disabled' : '') ?> id="duracion" name="duracion" value="<?= h($duracion) ?>" type="number">
             <br>
             <label for="genero">Género:*</label>
             <br>
-            <input <?= ($bInsercionCorrecta ? 'disabled' : '') ?> id="genero" name="genero" value="<?= $genero ?>" type="text">
+            <input <?= ($bInsercionPosible ? 'disabled' : '') ?> id="genero" name="genero" value="<?= h($genero) ?>" type="text">
             <br>
             <br>
 
-            <input type="submit" value="<?= (!$bInsercionCorrecta ? 'Comprobar' : 'Insertar') . ' película' ?>">
+            <input type="submit" value="Insertar película">
 
         </form>
 
         <?php
-        if (!empty($_POST) && $rowGenero == null && !$bInsercionCorrecta):?>
-            <h3>Los parámetros para la inserción no son correctos.</h3>
+        if ($bInsercionPosible && $error == null){
+            require_once 'db/dbConfig.php';
+
+            $db = new PDO(DB_DSN, DB_USUARIO, DB_PASSWORD);
+
+            $stm = $db->prepare('INSERT INTO "peliculas" (titulo, sipnosis, anyo, duracion, genero_id)
+                                      VALUES (:titulo, :sipnosis, :anyo, :duracion, :genero_id)');
+            $stm->bindValue(':titulo', convertirParametroDefault($titulo));
+            $stm->bindValue(':sipnosis', convertirParametroDefault($sipnosis));
+            $stm->bindValue(':anyo', convertirParametroDefault($anyo));
+            $stm->bindValue(':duracion', convertirParametroDefault($duracion));
+            $stm->bindValue(':genero_id', convertirParametroDefault($generoId));
+
+            $bInsertar = $stm->execute();
+
+            if ($bInsertar){
+                header('Location: index.php');
+            } else {
+                $error = 'Inserción incorrecta';
+            }
+
+        } // if ($bInsercionPosible && $error == null)
+
+        if ($error != null):?>
+            <h3><?= h($error) ?></h3>
         <?php endif; ?>
 
     </body>

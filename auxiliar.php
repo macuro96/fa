@@ -4,9 +4,13 @@ require_once "db/dbConfig.php";
 
 function h($salida)
 {
-    htmlspecialchars($salida, ENT_QUOTES | ENT_SUBSTITUTE);
+    return htmlspecialchars($salida, ENT_QUOTES | ENT_SUBSTITUTE);
 }
 
+function convertirParametroDefault($parametro)
+{
+    return ($parametro != false ? $parametro : 'DEFAULT');
+} // function comprobarParametro($parametro)
 
 /**
  * Busca una pelicula dentro de la base de datos a partir de su ID
