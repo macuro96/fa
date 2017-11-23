@@ -88,6 +88,72 @@ END;
 $$
 LANGUAGE plpgsql;
 
+-- ModificarPelicula (SIN REFACTORIZAR Y CON REPETICION DE FUNCION)
+
+CREATE OR REPLACE FUNCTION "modificarPelicula"(iId BIGINT, sTitulo VARCHAR, sipnosis TEXT, anyo NUMERIC, duracion NUMERIC, iGenero_id BIGINT) RETURNS BOOLEAN
+AS $$
+DECLARE
+	bModificar BOOLEAN;
+	sSipnosis  TEXT;
+	iAnyo      NUMERIC;
+	iDuracion  NUMERIC;
+
+	sSipnosisDefault TEXT;
+	iAnyoDefault     NUMERIC;
+	iDuracionDefault NUMERIC;
+
+BEGIN
+
+	bModificar := FALSE;
+
+	SELECT d.adsrc AS default_value
+	INTO sSipnosisDefault
+	FROM   pg_catalog.pg_attribute a
+	LEFT   JOIN pg_catalog.pg_attrdef d ON (a.attrelid, a.attnum)
+					     = (d.adrelid,  d.adnum)
+	WHERE  NOT a.attisdropped
+	AND    a.attnum > 0
+	AND    a.attrelid = 'public.peliculas'::regclass
+	AND    a.attname = 'sipnosis';
+
+	SELECT d.adsrc AS default_value
+	INTO iAnyoDefault
+	FROM   pg_catalog.pg_attribute a
+	LEFT   JOIN pg_catalog.pg_attrdef d ON (a.attrelid, a.attnum)
+					     = (d.adrelid,  d.adnum)
+	WHERE  NOT a.attisdropped
+	AND    a.attnum > 0
+	AND    a.attrelid = 'public.peliculas'::regclass
+	AND    a.attname = 'anyo';
+
+	SELECT d.adsrc AS default_value
+	INTO iDuracionDefault
+	FROM   pg_catalog.pg_attribute a
+	LEFT   JOIN pg_catalog.pg_attrdef d ON (a.attrelid, a.attnum)
+					     = (d.adrelid,  d.adnum)
+	WHERE  NOT a.attisdropped
+	AND    a.attnum > 0
+	AND    a.attrelid = 'public.peliculas'::regclass
+	AND    a.attname = 'duracion';
+
+	sSipnosis := COALESCE(sipnosis, sSipnosisDefault);
+	iAnyo     := COALESCE(anyo, iAnyoDefault);
+	iDuracion := COALESCE(duracion, iDuracionDefault);
+
+    UPDATE "peliculas" SET "titulo" = sTitulo, "sipnosis" = sSipnosis, "anyo" = iAnyo,
+                            "duracion" = iDuracion, "genero_id" = iGenero_id
+    WHERE ("id" = iId);
+
+	IF FOUND THEN
+		bModificar := TRUE;
+	END IF;
+
+	RETURN bModificar;
+
+END;
+$$
+LANGUAGE plpgsql;
+
 -- INSERT
 
 DELETE FROM "generos";

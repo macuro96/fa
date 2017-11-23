@@ -37,6 +37,26 @@ function buscarPelicula(int $id)
     return $aResultado;
 }
 
+function buscarGenero(int $id)
+{
+    $aResultado = ['success' => false, 'error' => '', 'salida' => null];
+
+    $db  = new PDO(DB_DSN, DB_USUARIO, DB_PASSWORD);
+    $stm = $db->prepare('SELECT * FROM "generos" WHERE id = :id');
+    $stm->bindValue(":id", $id);
+
+    $bSelect = $stm->execute();
+    $row     = $stm->fetchObject();
+
+    if ($bSelect){
+        $aResultado['success'] = $bSelect;
+        $aResultado['salida']  = $row;
+
+    } // if ($bSelect)
+
+    return $aResultado;
+}
+
 /**
  * Borra una pelicula dentro de la base de datos a partir de su ID
  * @param  int    $id          ID de la pelicula

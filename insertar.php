@@ -78,8 +78,6 @@
 
             $db = new PDO(DB_DSN, DB_USUARIO, DB_PASSWORD);
 
-            var_dump($duracion);
-
             $stm = $db->prepare('SELECT * FROM "insertarPelicula"(:titulo, :sipnosis, :anyo, :duracion, :genero_id)');
             $stm->bindValue(':titulo', $titulo);
             $stm->bindValue(':sipnosis', $sipnosis);

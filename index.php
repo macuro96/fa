@@ -47,6 +47,7 @@
                             <td><?= $row->genero_id ?></td>
                             <td>
                                 <a href="borrar.php?id=<?= $row->id ?>">Borrar</a>
+                                <a href="modificar.php?id=<?= $row->id ?>">Modificar</a>
                             </td>
                         </tr>
                     <?php endwhile; ?>
