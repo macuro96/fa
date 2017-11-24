@@ -10,7 +10,7 @@ CREATE TABLE "generos"
 CREATE TABLE "peliculas"
 (
      id        BIGSERIAL       PRIMARY KEY
-   , titulo    VARCHAR(255)    NOT NULL UNIQUE
+   , titulo    VARCHAR(255)    UNIQUE
    , sipnosis  TEXT
    , anyo      NUMERIC(4)
    , duracion  NUMERIC(3)      DEFAULT 0
@@ -20,6 +20,15 @@ CREATE TABLE "peliculas"
                                REFERENCES generos (id)
                                ON DELETE NO ACTION
                                ON UPDATE CASCADE
+);
+
+
+CREATE TABLE "usuarios"
+(
+    id          BIGSERIAL       PRIMARY KEY
+  , nombre      VARCHAR(255)    UNIQUE
+  , password    VARCHAR(32)
+
 );
 
 -- Funciones
@@ -169,3 +178,8 @@ INSERT INTO "peliculas" (titulo, sipnosis, anyo, duracion, genero_id)
 VALUES ('Los Últimos Jedi', 'Va uno y se cae...', 2017, 204, 3)
      , ('Los Goonies', 'Unos niños encuentran un tesoro', 1984, 120, 5)
      , ('Aquí llega Condemor', 'Mejor no cuento nada...', 1996, 90, 1);
+
+DELETE FROM "usuarios";
+INSERT INTO "usuarios" (nombre, password)
+VALUES ('manuel', 1234);
+-- crypt('pepe', gen_salt('bf'))

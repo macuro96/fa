@@ -22,7 +22,11 @@
         <?php unset($_SESSION['mensaje']);
         } // if (isset($_SESSION['mensaje']))
 
-        ?>
+        if (!isset($_SESSION['Usuario'])):?>
+            <a href="login.php">Login</a>
+            <br>
+            <br>
+        <?php endif; ?>
 
         <form action="#" method="get">
             <input value="<?= htmlentities($titulo) ?>" name="titulo" type="text">
