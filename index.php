@@ -1,3 +1,4 @@
+<?php session_name('fa'); session_start(); ?>
 <!DOCTYPE html>
 <html>
     <head>
@@ -14,6 +15,12 @@
 
         $stm     = $aResultadoSQL['salida'];
         $bSelect = $aResultadoSQL['success'];
+
+        if (isset($_SESSION['mensaje'])){?>
+            <h3><?= $_SESSION['mensaje'] ?></h3>
+
+        <?php unset($_SESSION['mensaje']);
+        } // if (isset($_SESSION['mensaje']))
 
         ?>
 

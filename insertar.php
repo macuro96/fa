@@ -1,3 +1,4 @@
+<?php session_name('fa'); session_start(); ?>
 <!DOCTYPE html>
 <html>
     <head>
@@ -91,7 +92,9 @@
                 $bInsertadoCorrectamente = $stm->fetchObject();
 
                 if ($bInsertadoCorrectamente){
+                    $_SESSION['mensaje'] = 'Película insertada correctamente';
                     header('Location: index.php');
+
                 } else {
                     $error = 'Inserción incorrecta'; // refactorizar
                 }

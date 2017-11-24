@@ -1,3 +1,4 @@
+<?php session_name('fa'); session_start(); ?>
 <?php
 
 $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);
@@ -15,6 +16,7 @@ $nRows   = $aResultadoSQL['salida'];
 
 if ($bDelete):
     if ($nRows > 0):
+        $_SESSION['mensaje'] = 'La película se ha borrado correctamente';
         header('Location: ../index.php');
     else: ?>
         <h3>No existe la una película con id <?= htmlentities($id) ?></h3>

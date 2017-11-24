@@ -1,3 +1,4 @@
+<?php session_name('fa'); session_start(); ?>
 <?php
 require_once "auxiliar.php";
 
@@ -72,7 +73,9 @@ if (empty($_POST)){
                 $bModificadoCorrectamente = $stm->fetchObject();
 
                 if ($bModificadoCorrectamente){
+                    $_SESSION['mensaje'] = 'La película se ha modificado correctamente';
                     header('Location: index.php');
+                    
                 } else {
                     $error = 'Modificación incorrecta'; // refactorizar
                 }

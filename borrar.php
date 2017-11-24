@@ -1,3 +1,4 @@
+<?php session_name('fa'); session_start(); ?>
 <?php
 
 require_once "auxiliar.php";
