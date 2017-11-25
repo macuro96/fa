@@ -1,5 +1,6 @@
 DROP TABLE IF EXISTS "peliculas" CASCADE;
-DROP TABLE IF EXISTS "generos" CASCADE;
+DROP TABLE IF EXISTS "generos"   CASCADE;
+DROP TABLE IF EXISTS "usuarios"  CASCADE;
 
 CREATE TABLE "generos"
 (
@@ -21,7 +22,6 @@ CREATE TABLE "peliculas"
                                ON DELETE NO ACTION
                                ON UPDATE CASCADE
 );
-
 
 CREATE TABLE "usuarios"
 (
@@ -51,6 +51,6 @@ VALUES ('Los Últimos Jedi', 'Va uno y se cae...', 2017, 204, 3)
      , ('Aquí llega Condemor', 'Mejor no cuento nada...', 1996, 90, 1);
 
 DELETE FROM "usuarios";
-INSERT INTO "usuarios" (nombre, password)
-VALUES ('manuel', 1234);
--- crypt('pepe', gen_salt('bf'))
+--INSERT INTO "usuarios" (nombre, password)
+--VALUES ('manuel', 1234);
+-- crypt('pepito', gen_salt('bf'))

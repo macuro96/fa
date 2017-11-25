@@ -1,0 +1,25 @@
+body {
+    background-color: rgb(39, 39, 39);
+
+    color: white;
+
+}
+
+.container-fluid {
+    padding-top: 20px;
+}
+
+form {
+    padding: 10px;
+    padding-bottom: 20px;
+    padding-left: 25px;
+    padding-right: 25px;
+
+    background-color: rgb(73, 73, 73);
+}
+
+.prueba {
+    border-style: solid;
+    border-color: black;
+    border-width: 2px;    
+}
