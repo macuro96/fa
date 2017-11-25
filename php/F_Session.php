@@ -21,3 +21,12 @@ function SessionCerrar()
     }
 
 } // function SessionCerrar()
+
+function SessionMensajeModificar($mensaje)
+{
+    $_SESSION['mensaje'] = $mensaje;
+}
+
+function SessionMensaje(){
+    return $_SESSION['mensaje'];
+}

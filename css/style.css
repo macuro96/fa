@@ -16,10 +16,25 @@ form {
     padding-right: 25px;
 
     background-color: rgb(73, 73, 73);
+
+    margin-bottom: 30px;
+
 }
 
 .prueba {
     border-style: solid;
     border-color: black;
     border-width: 2px;    
+}
+
+table {
+    color: black;
+}
+
+thead {
+    color: white;
+}
+
+.table-striped > tbody > tr:nth-child(2n) > td, .table-striped > tbody > tr:nth-child(2n) > th {
+    background-color: rgb(226, 226, 226);
 }

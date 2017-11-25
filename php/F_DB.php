@@ -2,13 +2,17 @@
 
 require_once 'db/CFG_DB.php';
 
-$db = new PDO(DB_DSN, DB_USUARIO, DB_PASSWORD);
+function DBconectar(){
+    return new PDO(DB_DSN, DB_USUARIO, DB_PASSWORD);
+}
 
 function DBbuscarPeliculaId($id)
 {
     $aResultado = array('success' => false, 'error' => '', 'salida' => null);
 
-    $stm = $db->prepare('SELECT * FROM "peliculas" WHERE "id" = :id');
+    $db = DBconectar();
+
+    $stm = $db->prepare('SELECT * FROM "viewPeliculas" WHERE "id" = :id');
     $stm->bindValue(':id', $id);
 
     $bSelect = $stm->execute();
@@ -28,8 +32,10 @@ function DBbuscarPeliculaTitulo($titulo, $bExacto = false)
 {
     $aResultado = array('success' => false, 'error' => '', 'salida' => null);
 
-    $stm = ($bExacto ? $db->prepare('SELECT * FROM "peliculas" WHERE "titulo" = :titulo')
-                     : $db->prepare('SELECT * FROM "peliculas" WHERE "titulo" ILIKE :titulo'));
+    $db = DBconectar();
+
+    $stm = ($bExacto ? $db->prepare('SELECT * FROM "viewPeliculas" WHERE "titulo" = :titulo')
+                     : $db->prepare('SELECT * FROM "viewPeliculas" WHERE "titulo" ILIKE :titulo'));
     $stm->bindValue(':titulo', (!$bExacto ? '%' : '').$titulo.(!$bExacto ? '%' : ''));
 
     $bSelect = $stm->execute();
@@ -48,6 +54,8 @@ function DBbuscarPeliculaTitulo($titulo, $bExacto = false)
 function DBbuscarGeneroId($id)
 {
     $aResultado = array('success' => false, 'error' => '', 'salida' => null);
+
+    $db = DBconectar();
 
     $stm = $db->prepare('SELECT * FROM "generos" WHERE "id" = :id');
     $stm->bindValue(':id', $id);
@@ -68,6 +76,8 @@ function DBbuscarGeneroId($id)
 function DBbuscarGeneroNombre($nombre, $bExacto = false)
 {
     $aResultado = array('success' => false, 'error' => '', 'salida' => null);
+
+    $db = DBconectar();
 
     $stm = ($bExacto ? $db->prepare('SELECT * FROM "generos" WHERE "nombre" = :nombre')
                      : $db->prepare('SELECT * FROM "generos" WHERE "nombre" ILIKE :nombre'));

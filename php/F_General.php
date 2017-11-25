@@ -6,7 +6,7 @@ function h($cadena)
 
 } // function h($cadena)
 
-function validarPost()
+function filtroValido($sComprobar)
 {
-    
+    return ($sComprobar != null && $sComprobar !== false);
 }
