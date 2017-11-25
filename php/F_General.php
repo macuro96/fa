@@ -9,4 +9,5 @@ function h($cadena)
 function filtroValido($sComprobar)
 {
     return ($sComprobar != null && $sComprobar !== false);
-}
+
+} // function filtroValido($sComprobar)

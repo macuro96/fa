@@ -27,6 +27,27 @@ function SessionMensajeModificar($mensaje)
     $_SESSION['mensaje'] = $mensaje;
 }
 
-function SessionMensaje(){
-    return $_SESSION['mensaje'];
+function SessionMensajeBorrar()
+{
+    unset($_SESSION['mensaje']);
 }
+
+function SessionMensajeExiste(){
+    return isset($_SESSION['mensaje']);
+}
+
+function SessionMensaje(){
+    return (SessionMensajeExiste() ? $_SESSION['mensaje'] : null);
+}
+
+function notificacionMensaje(){
+    if (SessionExiste() && SessionMensajeExiste()): ?>    
+        <div class="alert alert-warning alert-dismissible" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <strong>Mensaje</strong> <?= SessionMensaje() ?>
+        </div>        
+        <?php SessionMensajeBorrar();        
+
+    endif;
+
+} // function notificacionMensaje()

@@ -6,7 +6,7 @@
     require_once 'php/F_General.php';
     require_once 'php/F_DB.php';
 
-    $tituloBuscador = filter_input(INPUT_GET, 'titulo-buscador');
+    $tituloBuscador = trim(filter_input(INPUT_GET, 'titulo-buscador'));
 
     try {
         $aResultadoSQLPeliculas = DBbuscarPeliculaTitulo($tituloBuscador);
@@ -33,6 +33,8 @@
 
     <body>
         <div class="container-fluid">
+            <?php notificacionMensaje() ?>
+
             <div class="row">
                 <div class="col-lg-offset-1 col-lg-4 page-header">
                     <h1>Film Affinity</h1>
@@ -42,8 +44,6 @@
             <div class="row">
                 <div class="col-lg-offset-1 col-lg-10">                    
                     <form action="index.php" method="get">
-                        <h3>Buscador</h3>
-
                         <div class="form-group">
                             <label for="titulo-buscador">Titulo:</label>
                             <input type="text" class="form-control" id="titulo-buscador" name="titulo-buscador" value="<?= h($tituloBuscador) ?>">
@@ -66,6 +66,7 @@
                             <th>Sipnosis</th>
                             <th>Duración</th>
                             <th>Género</th>
+                            <th>Operaciones</th>
                         </thead>
                         <tbody>                            
                             <?php
@@ -75,7 +76,11 @@
                                     <td><?= h($rowPelicula->anyo)       ?></td>
                                     <td><?= h($rowPelicula->sipnosis)   ?></td>
                                     <td><?= h($rowPelicula->duracion)   ?></td>
-                                    <td><?= h($rowPelicula->genero)     ?></td>  
+                                    <td><?= h($rowPelicula->genero)     ?></td> 
+                                    <td>
+                                        <a class="btn btn-primary" href="modificar.php?id=<?= h($rowPelicula->id) ?>" role="button">Modificar</a>
+                                        <a class="btn btn-danger"  href="borrar.php?id=<?=    h($rowPelicula->id) ?>" role="button">Borrar</a>
+                                    </td> 
                                 </tr>
                             <?php endwhile; // while ($rowPelicula = $stmPeliculas) ?>
                         </tbody>
