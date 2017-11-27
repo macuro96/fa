@@ -2,7 +2,6 @@
 require_once 'php/F_Session.php';
 SessionCrear();
 
-require_once 'php/F_General.php';
 require_once 'php/F_DB.php';
 
 $accion      = trim(filter_input(INPUT_GET, 'accion'));

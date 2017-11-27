@@ -6,6 +6,8 @@
 * @license https://www.gnu.org/licenses/gpl.txt
 */
 
+require_once 'F_General.php';
+
 function SessionCrear()
 {
     session_name('fa');

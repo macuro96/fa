@@ -2,7 +2,6 @@
 require_once 'php/F_Session.php';
 SessionCrear();
 
-require_once 'php/F_General.php';
 require_once 'php/F_DB.php';
 
 $tituloBuscador = trim(filter_input(INPUT_GET, 'titulo-buscador'));
@@ -82,7 +81,7 @@ try {
                                         <td><?= h($rowPelicula->genero)     ?></td> 
                                         <td>
                                             <a class="btn btn-primary" href="accion-pelicula.php?accion=Modificar&id=<?=     h($rowPelicula->id) ?>" role="button">Modificar</a>
-                                            <a class="btn btn-danger"  href="hacer-borrado.php?id=<?= h($rowPelicula->id) ?>" role="button">Borrar</a>
+                                            <a class="btn btn-danger"  href="borrar.php?id=<?= h($rowPelicula->id) ?>" role="button">Borrar</a>
                                         </td> 
                                     </tr>
                                 <?php endwhile; // while ($rowPelicula = $stmPeliculas) ?>

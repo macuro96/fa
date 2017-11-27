@@ -18,13 +18,13 @@ function DBbuscarPeliculaId($id, $bVista = true)
 
     $db = DBconectar();
 
-    $stm = $db->prepare('SELECT * FROM '.($bVista ? "viewPeliculas" : "peliculas").' WHERE "id" = :id');
+    $stm = $db->prepare('SELECT * FROM '.($bVista ? '"viewPeliculas"' : '"peliculas"').' WHERE "id" = :id');
     $stm->bindValue(':id', $id);
 
     $bSelect = $stm->execute();
 
     if (!$bSelect){
-        throw new Exception('No se ha podido buscar la película correctamente');
+        throw new Exception('No se ha podido encontrar la película correctamente');
     }
 
     $aResultado['success'] = true;
@@ -239,10 +239,39 @@ function DBinsertarPelicula($titulo, $anyo, $sipnosis, $genero_id, $duracion = '
 
 } // function DBinsertarPelicula($id, $titulo, $anyo, $sipnosis, $genero_id, $duracion = null)
 
+function DBborrarPelicula($id)
+{
+    $aResultado = array('success' => false, 'error' => '', 'salida' => null);
+
+    $db = DBconectar();
+
+    $bExistePeliculaId = DBexistePeliculaId($id)['salida'];
+
+    if (!$bExistePeliculaId){
+        throw new Exception('No existe una película con ese identificador');
+    }
+
+    $stm = $db->prepare('DELETE FROM "peliculas" WHERE "id" = :id');
+    $stm->bindValue(':id', $id);
+
+    $bDelete = $stm->execute();
+
+    if (!$bDelete){
+        throw new Exception('No se ha podido borrar la película correctamente');
+    }
+
+    $aResultado['success'] = true;
+    $aResultado['salida']  = ($stm->rowCount() > 0);
+
+    return $aResultado;    
+
+} // function DBborrarPelicula($id)
+
 function comprobarPorDefecto($valor)
 {
     return ($valor == 'default' ? null : $valor);
-}
+
+} // function comprobarPorDefecto($valor)
 
 function validar($aCampos, &$errores)
 {
