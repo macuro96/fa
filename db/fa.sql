@@ -11,7 +11,7 @@ CREATE TABLE "generos"
 CREATE TABLE "peliculas"
 (
      id        BIGSERIAL       PRIMARY KEY
-   , titulo    VARCHAR(255)    UNIQUE
+   , titulo    VARCHAR(255)    NOT NULL
    , sipnosis  TEXT
    , anyo      NUMERIC(4)
    , duracion  NUMERIC(3)      DEFAULT 0
