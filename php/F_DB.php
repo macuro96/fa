@@ -6,19 +6,19 @@ function DBconectar(){
     return new PDO(DB_DSN, DB_USUARIO, DB_PASSWORD);
 }
 
-function DBbuscarPeliculaId($id)
+function DBbuscarPeliculaId($id, $bVista = true)
 {
     $aResultado = array('success' => false, 'error' => '', 'salida' => null);
 
     $db = DBconectar();
 
-    $stm = $db->prepare('SELECT * FROM "viewPeliculas" WHERE "id" = :id');
+    $stm = $db->prepare('SELECT * FROM '.($bVista ? "viewPeliculas" : "peliculas").' WHERE "id" = :id');
     $stm->bindValue(':id', $id);
 
     $bSelect = $stm->execute();
 
     if (!$bSelect){
-        throw Exception('No se ha podido buscar la película correctamente');
+        throw new Exception('No se ha podido buscar la película correctamente');
     }
 
     $aResultado['success'] = true;
@@ -53,7 +53,7 @@ function DBbuscarPeliculaTitulo($titulo, $bSipnosisCorta = false, $bExacto = fal
     $bSelect = $stm->execute();
 
     if (!$bSelect){
-        throw Exception('No se ha podido buscar la película correctamente');
+        throw new Exception('No se ha podido buscar la película correctamente');
     }
 
     $aResultado['success'] = true;
@@ -75,7 +75,7 @@ function DBbuscarGeneroId($id)
     $bSelect = $stm->execute();
 
     if (!$bSelect){
-        throw Exception('No se ha podido buscar el género correctamente');
+        throw new Exception('No se ha podido buscar el género correctamente');
     }
 
     $aResultado['success'] = true;
@@ -98,7 +98,7 @@ function DBbuscarGeneroNombre($nombre, $bExacto = false)
     $bSelect = $stm->execute();
 
     if (!$bSelect){
-        throw Exception('No se ha podido buscar el género correctamente');
+        throw new Exception('No se ha podido buscar el género correctamente');
     }
 
     $aResultado['success'] = true;
@@ -120,7 +120,7 @@ function DBexisteGeneroNombre($nombre)
     $bSelect = $stm->execute();
 
     if (!$bSelect){
-        throw Exception('No se ha podido comprobar la película correctamente');
+        throw new Exception('No se ha podido comprobar la película correctamente');
     }
 
     $aResultado['success'] = true;
@@ -129,6 +129,28 @@ function DBexisteGeneroNombre($nombre)
     return $aResultado;
 
 } // function DBexisteGeneroNombre($nombre)
+
+function DBexisteGeneroId($id)
+{
+    $aResultado = array('success' => false, 'error' => '', 'salida' => null);
+
+    $db = DBconectar();
+
+    $stm = $db->prepare('SELECT COUNT(*) FROM "generos" WHERE "id" = :id');
+    $stm->bindValue(':id', $id);
+
+    $bSelect = $stm->execute();
+
+    if (!$bSelect){
+        throw new Exception('No se ha podido comprobar el género correctamente');
+    }
+
+    $aResultado['success'] = true;
+    $aResultado['salida']  = $stm->fetchColumn() > 0;
+
+    return $aResultado;
+
+} // function DBexistePeliculaId($id)
 
 function DBexistePeliculaId($id)
 {
@@ -142,7 +164,7 @@ function DBexistePeliculaId($id)
     $bSelect = $stm->execute();
 
     if (!$bSelect){
-        throw Exception('No se ha podido comprobar la película correctamente');
+        throw new Exception('No se ha podido comprobar la película correctamente');
     }
 
     $aResultado['success'] = true;
@@ -152,9 +174,73 @@ function DBexistePeliculaId($id)
 
 } // function DBexistePeliculaId($id)
 
+function DBmodificarPelicula($id, $titulo, $anyo, $sipnosis, $genero_id, $duracion = 'default')
+{
+    $aResultado = array('success' => false, 'error' => '', 'salida' => null);
+
+    $db = DBconectar();
+    
+    $stm = $db->prepare('UPDATE "peliculas" SET "titulo"    = :titulo,       "sipnosis"  = :sipnosis,
+                                                "anyo"      = :anyo,         "genero_id" = :genero_id'.
+                                                ($duracion != 'default' ? ', "duracion"  = :duracion' : '').                                                
+                        ' WHERE "id" = :id');
+
+    $stm->bindValue(':id', $id);
+    $stm->bindValue(':titulo', $titulo);
+    $stm->bindValue(':sipnosis', $sipnosis);
+    $stm->bindValue(':anyo', $anyo);
+    $stm->bindValue(':genero_id', $genero_id);
+    if ($duracion != 'default'){ $stm->bindValue('duracion', $duracion); }
+
+    $bUpdate = $stm->execute();
+
+    if (!$bUpdate){
+        throw new Exception('No se ha podido modificar la película correctamente');
+    }
+
+    $aResultado['success'] = true;
+    $aResultado['salida']  = ($stm->rowCount() > 0);
+
+    return $aResultado;
+
+} // function DBmodificarPelicula($id, $titulo, $anyo, $sipnosis, $genero_id, $duracion = 'default')
+
+function DBinsertarPelicula($titulo, $anyo, $sipnosis, $genero_id, $duracion = 'default')
+{
+    $aResultado = array('success' => false, 'error' => '', 'salida' => null);
+
+    $db = DBconectar();
+
+    $stm = $db->prepare('INSERT INTO "peliculas" (titulo, sipnosis, anyo, genero_id'.($duracion != 'default' ? ', duracion' : '').')
+                              VALUES (:titulo, :sipnosis, :anyo, :genero_id'.($duracion != 'default' ? ', :duracion' : '').')');
+
+    $stm->bindValue(':titulo', $titulo);
+    $stm->bindValue(':sipnosis', $sipnosis);
+    $stm->bindValue(':anyo', $anyo);
+    $stm->bindValue(':genero_id', $genero_id);
+    if ($duracion != 'default'){ $stm->bindValue('duracion', $duracion); }
+
+    $bInsert = $stm->execute();
+
+    if (!$bInsert){
+        throw new Exception('No se ha podido insertar la película correctamente');
+    }
+
+    $aResultado['success'] = true;
+    $aResultado['salida']  = ($stm->rowCount() > 0);
+
+    return $aResultado;
+
+} // function DBinsertarPelicula($id, $titulo, $anyo, $sipnosis, $genero_id, $duracion = null)
+
+function comprobarPorDefecto($valor)
+{
+    return ($valor == 'default' ? null : $valor);
+}
+
 function validar($aCampos, &$errores)
 {
-    foreach ($aCampos as $nombre => $valor){
+    foreach ($aCampos as $nombre => &$valor){
         switch ($nombre){           
             case 'tituloPelicula':
                 if ($valor == null){
@@ -165,31 +251,39 @@ function validar($aCampos, &$errores)
                 break;
 
             case 'anyoPelicula':
-                if ($valor != null && filter_var($valor, FILTER_VALIDATE_INT, [
-                    'options' => [
-                        'min_range' => 0,
-                        'max_range' => 9999
-                    ]
-                ]) === false){ $errores[] = 'El año no es válido'; }
+                if ($valor == null && !is_null($valor)){
+                    $valor = null;
+                } else { // if ($valor == null && !is_null($valor))
+                    if (filter_var($valor, FILTER_VALIDATE_INT, [
+                        'options' => [
+                            'min_range' => 0,
+                            'max_range' => 9999
+                        ]
+                    ]) === false){ $errores[] = 'El año no es válido'; }
+
+                } // else ($valor == null && !is_null($valor))
                 break;
 
             case 'duracionPelicula':    // Duracion en minutos
-                if ($valor != null && filter_var($valor, FILTER_VALIDATE_INT, [
-                    'options' => [
-                        'min_range' => 0,
-                        'max_range' => 9999
-                    ]
-                ]) === false){ $errores[] = 'La duración no es válida'; }
+                if ($valor == null){                        
+                    $valor = 'default';
+                } else { // if ($valor == null)
+                    if (filter_var($valor, FILTER_VALIDATE_INT, [
+                        'options' => [
+                            'min_range' => 0,
+                            'max_range' => 9999
+                        ]
+                    ]) === false){ $errores[] = 'La duración no es válida'; }
+
+                } // else ($valor == null)
                 break;
 
             case 'generoPelicula':
                 if ($valor == null){
                     $errores[]  = 'El genero es obligatorio';
-                } else if (mb_strlen($valor) > 255) {
-                    $errores[] = 'El genero es demasiado largo';
                 } else {
                     try {
-                        $aResultadoSQLGeneroAccion = DBexisteGeneroNombre($valor);
+                        $aResultadoSQLGeneroAccion = DBexisteGeneroId($valor);
                         $bExisteGenero             = $aResultadoSQLGeneroAccion['salida'];
 
                         if (!$bExisteGenero){

@@ -8,12 +8,7 @@ require_once 'php/F_DB.php';
 $accion      = trim(filter_input(INPUT_GET, 'accion'));
 $idModificar = trim(filter_input(INPUT_GET, 'id'));    
 
-$errores     = array();
-$titulo      = '';
-$anyo        = '';
-$sipnosis    = '';
-$duracion    = '';
-$genero      = '';
+$errores = array();
 
 $titulo   = trim(filter_input(INPUT_POST, 'titulo'));
 $anyo     = trim(filter_input(INPUT_POST, 'anyo'));
@@ -26,39 +21,65 @@ try {
         throw new Exception('Acción no válida');
     }
 
-    if ($accion == 'Modificar'){
-        $aResultadoSQLPeliculas = DBbuscarPeliculaId($idModificar);
-        $stmPeliculas           = $aResultadoSQLPeliculas['salida'];
-
-        $rowPelicula = $stmPeliculas->fetchObject();            
-
-        if (!$rowPelicula){
-            throw new Exception('La película que intenta modificar no existe');
-        }
-
-        $titulo   = $rowPelicula->titulo;
-        $anyo     = $rowPelicula->anyo;
-        $sipnosis = $rowPelicula->sipnosis;
-        $duracion = $rowPelicula->duracion;
-        $genero   = $rowPelicula->genero;
-
-        $sConsultaId = '&id='.$idModificar;
-
-    } // if ($accion == 'Modificar')
-
     if (!empty($_POST)){
         validar([
             'tituloPelicula'   => $titulo,
-            'anyoPelicula'     => $anyo,
-            'duracionPelicula' => $duracion,
+            'anyoPelicula'     => &$anyo,
+            'duracionPelicula' => &$duracion,
             'generoPelicula'   => $genero
         ], $errores);
 
-    } // if (!empty($_POST))
+        if ($accion == 'Modificar'){
+            $aResultadoSQLModificar = DBmodificarPelicula($idModificar, $titulo, $anyo, $sipnosis, $genero, $duracion);
+            $bModificado            = $aResultadoSQLModificar['salida'];
+
+            if ($bModificado){
+                SessionMensajeModificar("La película " . $titulo . " se ha modificado correctamente");
+                header('Location: index.php');
+
+            } else {
+                throw new Exception('La película no se ha podido modificar correctamente');
+            }
+
+        } else if ($accion == 'Insertar'){ // if ($accion == 'Modificar')
+            $aResultadoSQLInsertar  = DBinsertarPelicula($titulo, $anyo, $sipnosis, $genero, $duracion);
+            $bInsertado             = $aResultadoSQLInsertar['salida'];
+
+            if ($bInsertado){
+                SessionMensajeModificar("La película " . $titulo . " se ha insertado correctamente");
+                header('Location: index.php');
+
+            } else {
+                throw new Exception('La película no se ha podido insertar correctamente');
+            }
+
+        } // else if ($accion == 'Insertar')
+
+    } else { // if (!empty($_POST))
+        if ($accion == 'Modificar'){
+            $aResultadoSQLPeliculas = DBbuscarPeliculaId($idModificar, false);
+            $stmPeliculas           = $aResultadoSQLPeliculas['salida'];
+
+            $rowPelicula = $stmPeliculas->fetchObject();            
+
+            if (!$rowPelicula){
+                throw new Exception('La película que intenta modificar no existe');
+            }
+
+            $titulo   = $rowPelicula->titulo;
+            $anyo     = $rowPelicula->anyo;
+            $sipnosis = $rowPelicula->sipnosis;
+            $duracion = $rowPelicula->duracion;
+            $genero   = $rowPelicula->genero_id;
+
+            $sConsultaId = '&id='.$idModificar;
+
+        } // if ($accion == 'Modificar')
+
+    } // else (!empty($_POST))
 
 } catch (Exception $e){
     $mensaje = $e->getMessage();
-    var_dump($mensaje);
 
     if ($mensaje != null){
         SessionMensajeModificar($e->getMessage());
@@ -104,14 +125,14 @@ try {
 
             <div class="row">
                 <div class="col-lg-offset-1 col-lg-8">
-                    <form action="accion-pelicula.php?accion=<?= h($accion) ?><?= isset($sConsultaId) ? h($sConsultaId) : '' ?>" method="get">
+                    <form action="accion-pelicula.php?accion=<?= h($accion) ?><?= isset($sConsultaId) ? h($sConsultaId) : '' ?>" method="post">
                         <div class="form-group">
                             <label for="titulo">Titulo:</label>
                             <input type="text" class="form-control" id="titulo" name="titulo" value="<?= h($titulo) ?>">
                         </div>
                         <div class="form-group">
                             <label for="anyo">Año:</label>
-                            <input type="text" class="form-control" id="anyo" name="anyo" value="<?= h($anyo) ?>">
+                            <input type="number" class="form-control" id="anyo" name="anyo" value="<?= h($anyo) ?>">
                         </div>
                         <div class="form-group">
                             <label for="sipnosis">Sipnosis:</label>
@@ -119,23 +140,21 @@ try {
                         </div>
                         <div class="form-group">
                             <label for="duracion">Duracion:</label>
-                            <input type="text" class="form-control" id="duracion" name="duracion" value="<?= h($duracion) ?>">
+                            <input type="number" class="form-control" id="duracion" name="duracion" value="<?= h(comprobarPorDefecto($duracion)) ?>">
                         </div>
                         <div class="form-group">
                             <label for="genero">Género:</label>
                             <select class="form-control" id="genero" name="genero">
-                                <option value="<?= h($genero) ?>"><?= h($genero) ?></option>                            
                                 <?php
                                 while ($rowGenero = $stmGeneros->fetchObject()):
                                     $nombreGenero = $rowGenero->nombre;
+                                    $idGenero     = $rowGenero->id;?>
 
-                                    if ($nombreGenero !== $genero):?>
-                                        <option value="<?= h($nombreGenero) ?>"><?= h($nombreGenero) ?></option>
-                                    <?php endif;
+                                    <option <?= ($idGenero === $genero ? 'selected' : '') ?> value="<?= h($idGenero) ?>"><?= h($nombreGenero) ?></option>
 
-                                endwhile;
-                                ?>
+                                <?php endwhile; ?>
                             </select>
+
                         </div>
                         <button type="submit" class="btn btn-default"><?= h($accion) ?></button>
                     </form>                    
