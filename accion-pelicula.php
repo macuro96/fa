@@ -33,27 +33,19 @@ try {
             $aResultadoSQLModificar = DBmodificarPelicula($idModificar, $titulo, $anyo, $sipnosis, $genero, $duracion);
             $bModificado            = $aResultadoSQLModificar['salida'];
 
-            if ($bModificado){
-                SessionMensajeModificar("La película " . $titulo . " se ha modificado correctamente");
-                header('Location: index.php');
-
-            } else {
-                throw new Exception('La película no se ha podido modificar correctamente');
-            }
+            SessionMensajeModificar($bModificado ? "La película ${titulo} se ha modificado correctamente"
+                                                 : 'La película no se ha podido modificar correctamente');
 
         } else if ($accion == 'Insertar'){ // if ($accion == 'Modificar')
             $aResultadoSQLInsertar  = DBinsertarPelicula($titulo, $anyo, $sipnosis, $genero, $duracion);
             $bInsertado             = $aResultadoSQLInsertar['salida'];
 
-            if ($bInsertado){
-                SessionMensajeModificar("La película " . $titulo . " se ha insertado correctamente");
-                header('Location: index.php');
-
-            } else {
-                throw new Exception('La película no se ha podido insertar correctamente');
-            }
+            SessionMensajeModificar($bInsertado ? "La película ${titulo} se ha insertado correctamente"
+                                                : 'La película no se ha podido insertar correctamente');
 
         } // else if ($accion == 'Insertar')
+
+        header('Location: index.php');
 
     } else { // if (!empty($_POST))
         if ($accion == 'Modificar'){
@@ -100,7 +92,6 @@ try {
 } // catch (Exception $e)
 
 ?>
-
 <!DOCTYPE html>
 <html lang="es">
     <head>
