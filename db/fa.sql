@@ -27,7 +27,7 @@ CREATE TABLE "usuarios"
 (
     id          BIGSERIAL       PRIMARY KEY
   , nombre      VARCHAR(255)    UNIQUE
-  , password    VARCHAR(32)
+  , password    VARCHAR(60)
 
 );
 
@@ -56,6 +56,6 @@ VALUES ('Los Últimos Jedi', 'Va uno y se cae...', 2017, 204, 3)
      , ('Aquí llega Condemor', 'Mejor no cuento nada...', 1996, 90, 1);
 
 DELETE FROM "usuarios";
---INSERT INTO "usuarios" (nombre, password)
---VALUES ('manuel', 1234);
--- crypt('pepito', gen_salt('bf'))
+INSERT INTO "usuarios" (nombre, password)
+VALUES ('manuel', crypt('1234manuel', gen_salt('bf', 10)))
+     , ('pepe', crypt('1234pepe', gen_salt('bf', 10)));

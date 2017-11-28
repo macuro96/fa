@@ -267,6 +267,28 @@ function DBborrarPelicula($id)
 
 } // function DBborrarPelicula($id)
 
+function DBbuscarUsuario($nombre, $password)
+{
+    $aResultado = array('success' => false, 'error' => '', 'salida' => null);
+
+    $db = DBconectar();
+
+    $stm = $db->prepare('SELECT * FROM "usuarios" WHERE "nombre" = :nombre');
+    $stm->bindValue(':nombre', $nombre);
+
+    $bSelect = $stm->execute();
+
+    if (!$bSelect){
+        throw new Exception('No se ha podido realizar la búsqueda del usuario');
+    }
+
+    $aResultado['success'] = true;
+    $aResultado['salida']  = $stm->fetchObject();
+
+    return $aResultado;
+
+} // function DBbuscarUsuario($nombre, $password)
+
 function comprobarPorDefecto($valor)
 {
     return ($valor == 'default' ? null : $valor);
@@ -334,6 +356,26 @@ function validar($aCampos, &$errores)
                 break;            
 
             default: break;
+
+            case 'nombreUsuario':
+                if ($valor == null){
+                    $errores[] = 'El usuario es obligatorio';
+                } else { // if ($valor == null){
+                    if (mb_strlen($valor) > 255){
+                        $errores[] = 'El nombre es demasiado largo';
+                    }                    
+                    if (mb_strpos($valor, ' ') !== false){
+                        $errores[] = 'El nombre no puede contener espacios';
+                    }
+
+                } // else ($valor == null){
+                break;
+
+            case 'passwordUsuario':
+                    if ($valor == null){
+                        $errores[] = 'La contraseña es obligatoria';
+                    } // if ($valor == null)
+                break;
 
         } // switch ($nombre)
 

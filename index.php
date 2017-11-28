@@ -37,6 +37,19 @@ try {
                 <div class="col-lg-offset-1 col-lg-4 page-header">
                     <h1>Film Affinity</h1>
                 </div>
+                <?php
+                if (SessionExisteSesionUsuario()):?>
+                    <div class="col-lg-offset-3 col-lg-1">
+                        <h4><?= SessionNombreUsuario() ?></h4>
+                    </div>
+                    <div class="col-lg-2">
+                        <a class="btn btn-primary center-block" href="logout.php" role="button">Cerrar sesión</a>
+                    </div>
+                <?php else: ?>
+                    <div class="col-lg-offset-5 col-lg-2">
+                        <a class="btn btn-primary center-block" href="login.php" role="button">Iniciar sesión</a>
+                    </div>
+                <?php endif; ?>                
             </div>
 
             <div class="row">
