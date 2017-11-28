@@ -28,6 +28,7 @@ if (!empty($_POST)){
 
             SessionIniciarSesionUsuario($idUsuario, $nombre);
             header('Location: index.php');
+            exit;
 
         } catch (Exception $err){
             $errores[] = $err->getMessage();
