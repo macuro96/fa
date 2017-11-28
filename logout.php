@@ -6,7 +6,7 @@
 * @license https://www.gnu.org/licenses/gpl.txt
 */
 
-require_once 'php/F_Session.php';
+require_once 'php/F_Session.php'; SessionAuth();
 
 try {
     SessionCerrarSesionUsuario();
@@ -15,3 +15,4 @@ try {
 }
 
 header('Location: index.php');
+exit;

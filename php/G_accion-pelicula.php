@@ -6,7 +6,7 @@
 * @license https://www.gnu.org/licenses/gpl.txt
 */
 
-require_once 'F_Session.php';
+require_once 'F_Session.php'; SessionAuth();
 require_once 'F_DB.php';
 
 $accion      = trim(filter_input(INPUT_GET, 'accion'));
@@ -48,6 +48,7 @@ try {
         } // else if ($accion == 'Insertar')
 
         header('Location: index.php');
+        exit;
 
     } else { // if (!empty($_POST))
         if ($accion == 'Modificar'){

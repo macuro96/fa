@@ -6,7 +6,7 @@
 * @license https://www.gnu.org/licenses/gpl.txt
 */
 
-require_once 'php/F_Session.php';
+require_once 'php/F_Session.php'; SessionAuth();
 require_once 'php/F_DB.php';
 
 $id = trim(filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT));

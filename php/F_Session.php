@@ -83,7 +83,17 @@ function SessionExisteSesionUsuario()
 function SessionNombreUsuario()
 {
     return $_SESSION['Usuario']['nombre'];
-}
+
+} // function SessionNombreUsuario()
+
+function SessionAuth()
+{
+    if (!SessionExisteSesionUsuario()){
+        volverIndexMensaje('Usuario no identificado');
+        exit;
+    } 
+
+} // function SessionAuth()
 
 function notificacionMensaje(){
     if (SessionExiste() && SessionMensajeExiste()): ?>    
@@ -97,8 +107,10 @@ function notificacionMensaje(){
 
 } // function notificacionMensaje()
 
-function volverIndexMensaje(Exception $e)
+function volverIndexMensaje($e)
 {
-    SessionMensajeModificar($e->getMessage());
+    SessionMensajeModificar(($e instanceof Exception) ? $e->getMessage() : $e);
     header('Location: index.php');       
-}
+    exit;
+
+} // function volverIndexMensaje($e)
