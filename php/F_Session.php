@@ -21,10 +21,8 @@ function SessionCerrar()
 {
     if (SessionExiste()){
         session_destroy();
-    } else { // 
-        throw new Exception("No existe ninguna sesión para cerrar");
     }
-
+    
 } // function SessionCerrar()
 
 function SessionMensajeModificar($mensaje)

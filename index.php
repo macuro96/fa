@@ -29,7 +29,7 @@
                     <form action="index.php" method="get">
                         <div class="form-group">
                             <label for="titulo-buscador">Titulo:</label>
-                            <input type="text" class="form-control" id="titulo-buscador" name="titulo-buscador" value="<?= gTituloBuscador($tituloBuscador) ?>">
+                            <input type="text" class="form-control" id="titulo-buscador" name="titulo-buscador" value="<?= h($tituloBuscador) ?>">
                         </div>
                         <button type="submit" class="btn btn-default">Buscar</button>
                     </form>

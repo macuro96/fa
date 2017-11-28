@@ -14,9 +14,154 @@ define('TABLA_USUARIOS', '"usuarios"');
 
 define('VISTA_PELICULAS', '"viewPeliculas"');
 
+function DBbuscadorPelicula($titulo)
+{
+    return DBsql('SELECT "id", "titulo", "anyo", left("sipnosis", 40) AS "sipnosis", "duracion", "genero"
+                    FROM '.VISTA_PELICULAS.' WHERE "titulo" ILIKE :titulo',
+
+                 'No se ha podido buscar la película con ese título correctamente',                 
+                 ['titulo' => '%'.$titulo.'%']);
+
+} // function DBbuscadorPelicula($titulo)
+
+function DBpeliculaId($id)
+{
+    $stm = DBsql('SELECT * FROM '.VISTA_PELICULAS.' WHERE "id" = :id',                 
+
+                 'No se ha podido encontrar la película con ese identificador correctamente',                 
+                 [':id' => $id]);
+
+    $row = DBcomprobarStm($stm, 'No existe una película con ese identificador');
+
+    return $row;
+
+} // function DBbuscarPeliculaId($id)
+
+function DBgeneroId($id)
+{
+    $stm = DBsql('SELECT * FROM '.TABLA_GENEROS.' WHERE "id" = :id',                 
+
+                 'No se ha podido encontrar un género con ese identificador correctamente',                 
+                 [':id' => $id]);    
+
+    $row = DBcomprobarStm($stm, 'No existe un género con ese identificador');
+
+    return $row;
+
+} // function DBgeneroId($id)
+
+function DBgeneroNombre($nombre)
+{
+    $stm =  DBsql('SELECT * FROM '.TABLA_GENEROS.' WHERE "nombre" = :nombre',
+                  'No se ha podido encontrar un género con ese nombre correctamente',
+                  [':nombre' => $nombre]);
+
+    $row = DBcomprobarStm($stm, 'No existe un género con ese nombre');
+
+    return $row;
+
+} // function DBgeneroNombre($nombre)
+
+function DBgeneros()
+{
+    return DBsql('SELECT * FROM '.TABLA_GENEROS.'',
+                 'No se han podido encontrar todos los géneros correctamente');
+
+} // function DBgeneros()
+
+function DBmodificarPelicula($id, $titulo, $anyo, $sipnosis, $genero_id, $duracion = 'default')
+{
+    $aCampos = [
+          ':id'       => $id
+        , ':titulo'   => $titulo
+        , ':sipnosis' => $sipnosis
+        , ':anyo'     => $anyo
+        , 'genero_id' => $genero_id
+    ];
+    
+    if ($duracion != 'default'){
+        $aCampos[':duracion'] = $duracion; 
+    }
+
+    $stm = DBsql('UPDATE '.TABLA_PELICULAS.'
+                     SET "titulo" = :titulo, "sipnosis" = :sipnosis, "anyo" = :anyo, "genero_id" = :genero_id'.
+                         ($duracion != 'default' ? ', "duracion"  = :duracion' : '').                                                
+                        ' WHERE "id" = :id',
+
+                 'No se ha podido modificar la película correctamente',
+                 $aCampos);
+
+    $nFilasAfectadas = $stm->rowCount();
+
+    return ($nFilasAfectadas > 0);
+
+} // function DBmodificarPelicula($id, $titulo, $anyo, $sipnosis, $genero_id, $duracion = 'default')
+
+function DBinsertarPelicula($titulo, $anyo, $sipnosis, $genero_id, $duracion = 'default')
+{
+    $aCampos = [
+        ':titulo'    => $titulo
+      , ':sipnosis'  => $sipnosis
+      , ':anyo'      => $anyo
+      , ':genero_id' => $genero_id
+    ];
+
+    if ($duracion != 'default'){
+        $aCampos[':duracion'] = $duracion; 
+    }
+
+    $stm = DBsql('INSERT INTO '.TABLA_PELICULAS.' (titulo, sipnosis, anyo, genero_id'.($duracion != 'default' ? ', duracion'  : '').')
+                               VALUES (:titulo, :sipnosis, :anyo, :genero_id'.($duracion != 'default' ? ', :duracion' : '').')',
+
+                'No se ha podido insertar la película correctamente',
+                $aCampos);
+
+    $nFilasAfectadas = $stm->rowCount();
+
+    return ($nFilasAfectadas > 0);
+
+} // function DBinsertarPelicula($titulo, $anyo, $sipnosis, $genero_id, $duracion = 'default')
+
+function DBborrarPelicula($id)
+{
+    DBpeliculaId($id);
+
+    $stm = DBsql('DELETE FROM '.TABLA_PELICULAS.' WHERE "id" = :id',
+                 
+                 'No se ha podido borrar la pelicula con ese identificador correctamente',
+                 [':id' => $id]);
+
+    $nFilasAfectadas = $stm->rowCount();
+
+    return ($nFilasAfectadas > 0);
+
+} // function DBborrarPelicula($id)
+
+function DBusuario($nombre, $password)
+{
+    $error = 'No existe ningún usuario con ese nombre y/o contraseña';
+
+    $stm = DBsql('SELECT * FROM '.TABLA_USUARIOS.' WHERE "nombre" = :nombre',
+                 
+                 'No se ha podido realizar la búsqueda del usuario',
+                 [':nombre', $nombre]);
+
+    $row = DBcomprobarStm($stm, $error);
+
+    $bPasswordCorrecto = password_verify($password, $row->password);
+
+    if (!$bPasswordCorrecto){
+        throw new Exception($error);
+    }
+
+    return $row;
+
+} // function DBusuario($nombre, $password)
+
 function DBconectar(){
     return new PDO(DB_DSN, DB_USUARIO, DB_PASSWORD);
-}
+
+} // function DBconectar()
 
 function DBsql($sql, $error, $aCampos = []){
     $db = DBconectar();
@@ -30,281 +175,24 @@ function DBsql($sql, $error, $aCampos = []){
     $bSQL = $stm->execute();
 
     if (!$bSQL){
-        throw new Exception($error);
+        throw new Exception($error);        
     }
 
     return $stm;
 
 } // function DBselect($aCampos, $sFrom, $aWhere)
 
-function DBbuscarPeliculaId($id, $bVista = true)
+function DBcomprobarStm($stm, $error)
 {
-    $aResultado = array('success' => false, 'error' => '', 'salida' => null);
+    $row = $stm->fetchObject();
 
-    $db = DBconectar();
-
-    $stm = $db->prepare('SELECT * FROM '.($bVista ? '"viewPeliculas"' : '"peliculas"').' WHERE "id" = :id');
-    $stm->bindValue(':id', $id);
-
-    $bSelect = $stm->execute();
-
-    if (!$bSelect){
-        throw new Exception('No se ha podido encontrar la película correctamente');
+    if (!$row){
+        throw new Exception($error);
     }
 
-    $aResultado['success'] = true;
-    $aResultado['salida']  = $stm;
+    return $row;
 
-    return $aResultado;
-
-} // function DBbuscarPeliculaId($id)
-
-function DBbuscarPeliculaTitulo($titulo, $bSipnosisCorta = false, $bExacto = false)
-{
-    $error = 'No se ha podido buscar la película correctamente';
-
-    if (!$bExacto){
-        $sql = ('SELECT ' . ($bSipnosisCorta ? '"id", "titulo", "anyo", left("sipnosis", 40) AS "sipnosis", "duracion", "genero"' :  '*') . 
-                '  FROM  '.VISTA_PELICULAS.' WHERE "titulo" ILIKE :titulo');
-        $aCampos = [':titulo' => '%'.$titulo.'%'];
-
-    } else {
-        $sql = ('SELECT ' . ($bSipnosisCorta ? '"id", "titulo", "anyo", left("sipnosis", 40) AS "sipnosis", "duracion", "genero"' :  '*') . 
-                '  FROM  "viewPeliculas" WHERE "titulo" = :titulo');        
-        $aCampos = [':titulo' => $titulo];
-    }
-
-    $stm = DBsql($sql, $error, $aCampos);
-
-    return $stm;
-
-} // function DBbuscarPeliculaTitulo($titulo, $bExacto = true)
-
-function DBbuscarGeneroId($id)
-{
-    $aResultado = array('success' => false, 'error' => '', 'salida' => null);
-
-    $db = DBconectar();
-
-    $stm = $db->prepare('SELECT * FROM "generos" WHERE "id" = :id');
-    $stm->bindValue(':id', $id);
-
-    $bSelect = $stm->execute();
-
-    if (!$bSelect){
-        throw new Exception('No se ha podido buscar el género correctamente');
-    }
-
-    $aResultado['success'] = true;
-    $aResultado['salida']  = $stm;
-
-    return $aResultado;
-
-} // function DBbuscarGeneroId($id)
-
-function DBbuscarGeneroNombre($nombre, $bExacto = false)
-{
-    $aResultado = array('success' => false, 'error' => '', 'salida' => null);
-
-    $db = DBconectar();
-
-    $stm = ($bExacto ? $db->prepare('SELECT * FROM "generos" WHERE "nombre" = :nombre')
-                     : $db->prepare('SELECT * FROM "generos" WHERE "nombre" ILIKE :nombre'));
-    $stm->bindValue(':nombre', (!$bExacto ? '%' : '').$nombre.(!$bExacto ? '%' : ''));
-
-    $bSelect = $stm->execute();
-
-    if (!$bSelect){
-        throw new Exception('No se ha podido buscar el género correctamente');
-    }
-
-    $aResultado['success'] = true;
-    $aResultado['salida']  = $stm;
-
-    return $aResultado;
-
-} // function DBbuscarGeneroNombre($nombre, $bExacto = false)
-
-function DBexisteGeneroNombre($nombre)
-{
-    $aResultado = array('success' => false, 'error' => '', 'salida' => null);
-
-    $db = DBconectar();
-
-    $stm = $db->prepare('SELECT COUNT(*) FROM "generos" WHERE "nombre" = :nombre');
-    $stm->bindValue(':nombre', $nombre);
-
-    $bSelect = $stm->execute();
-
-    if (!$bSelect){
-        throw new Exception('No se ha podido comprobar la película correctamente');
-    }
-
-    $aResultado['success'] = true;
-    $aResultado['salida']  = $stm->fetchColumn() > 0;
-
-    return $aResultado;
-
-} // function DBexisteGeneroNombre($nombre)
-
-function DBexisteGeneroId($id)
-{
-    $aResultado = array('success' => false, 'error' => '', 'salida' => null);
-
-    $db = DBconectar();
-
-    $stm = $db->prepare('SELECT COUNT(*) FROM "generos" WHERE "id" = :id');
-    $stm->bindValue(':id', $id);
-
-    $bSelect = $stm->execute();
-
-    if (!$bSelect){
-        throw new Exception('No se ha podido comprobar el género correctamente');
-    }
-
-    $aResultado['success'] = true;
-    $aResultado['salida']  = $stm->fetchColumn() > 0;
-
-    return $aResultado;
-
-} // function DBexistePeliculaId($id)
-
-function DBexistePeliculaId($id)
-{
-    $aResultado = array('success' => false, 'error' => '', 'salida' => null);
-
-    $db = DBconectar();
-
-    $stm = $db->prepare('SELECT COUNT(*) FROM "peliculas" WHERE "id" = :id');
-    $stm->bindValue(':id', $id);
-
-    $bSelect = $stm->execute();
-
-    if (!$bSelect){
-        throw new Exception('No se ha podido comprobar la película correctamente');
-    }
-
-    $aResultado['success'] = true;
-    $aResultado['salida']  = $stm->fetchColumn() > 0;
-
-    return $aResultado;
-
-} // function DBexistePeliculaId($id)
-
-function DBmodificarPelicula($id, $titulo, $anyo, $sipnosis, $genero_id, $duracion = 'default')
-{
-    $aResultado = array('success' => false, 'error' => '', 'salida' => null);
-
-    $db = DBconectar();
-    
-    $stm = $db->prepare('UPDATE "peliculas" SET "titulo"    = :titulo,       "sipnosis"  = :sipnosis,
-                                                "anyo"      = :anyo,         "genero_id" = :genero_id'.
-                                                ($duracion != 'default' ? ', "duracion"  = :duracion' : '').                                                
-                        ' WHERE "id" = :id');
-
-    $stm->bindValue(':id', $id);
-    $stm->bindValue(':titulo', $titulo);
-    $stm->bindValue(':sipnosis', $sipnosis);
-    $stm->bindValue(':anyo', $anyo);
-    $stm->bindValue(':genero_id', $genero_id);
-    if ($duracion != 'default'){ $stm->bindValue('duracion', $duracion); }
-
-    $bUpdate = $stm->execute();
-
-    if (!$bUpdate){
-        throw new Exception('No se ha podido modificar la película correctamente');
-    }
-
-    $aResultado['success'] = true;
-    $aResultado['salida']  = ($stm->rowCount() > 0);
-
-    return $aResultado;
-
-} // function DBmodificarPelicula($id, $titulo, $anyo, $sipnosis, $genero_id, $duracion = 'default')
-
-function DBinsertarPelicula($titulo, $anyo, $sipnosis, $genero_id, $duracion = 'default')
-{
-    $aResultado = array('success' => false, 'error' => '', 'salida' => null);
-
-    $db = DBconectar();
-
-    $stm = $db->prepare('INSERT INTO "peliculas" (titulo, sipnosis, anyo, genero_id'.($duracion != 'default' ? ', duracion' : '').')
-                              VALUES (:titulo, :sipnosis, :anyo, :genero_id'.($duracion != 'default' ? ', :duracion' : '').')');
-
-    $stm->bindValue(':titulo', $titulo);
-    $stm->bindValue(':sipnosis', $sipnosis);
-    $stm->bindValue(':anyo', $anyo);
-    $stm->bindValue(':genero_id', $genero_id);
-    if ($duracion != 'default'){ $stm->bindValue('duracion', $duracion); }
-
-    $bInsert = $stm->execute();
-
-    if (!$bInsert){
-        throw new Exception('No se ha podido insertar la película correctamente');
-    }
-
-    $aResultado['success'] = true;
-    $aResultado['salida']  = ($stm->rowCount() > 0);
-
-    return $aResultado;
-
-} // function DBinsertarPelicula($id, $titulo, $anyo, $sipnosis, $genero_id, $duracion = null)
-
-function DBborrarPelicula($id)
-{
-    $aResultado = array('success' => false, 'error' => '', 'salida' => null);
-
-    $db = DBconectar();
-
-    $bExistePeliculaId = DBexistePeliculaId($id)['salida'];
-
-    if (!$bExistePeliculaId){
-        throw new Exception('No existe una película con ese identificador');
-    }
-
-    $stm = $db->prepare('DELETE FROM "peliculas" WHERE "id" = :id');
-    $stm->bindValue(':id', $id);
-
-    $bDelete = $stm->execute();
-
-    if (!$bDelete){
-        throw new Exception('No se ha podido borrar la película correctamente');
-    }
-
-    $aResultado['success'] = true;
-    $aResultado['salida']  = ($stm->rowCount() > 0);
-
-    return $aResultado;    
-
-} // function DBborrarPelicula($id)
-
-function DBbuscarUsuario($nombre, $password)
-{
-    $aResultado = array('success' => false, 'error' => '', 'salida' => null);
-
-    $db = DBconectar();
-
-    $stm = $db->prepare('SELECT * FROM "usuarios" WHERE "nombre" = :nombre');
-    $stm->bindValue(':nombre', $nombre);
-
-    $bSelect = $stm->execute();
-
-    if (!$bSelect){
-        throw new Exception('No se ha podido realizar la búsqueda del usuario');
-    }
-
-    $aResultado['success'] = true;
-    $aResultado['salida']  = $stm->fetchObject();
-
-    return $aResultado;
-
-} // function DBbuscarUsuario($nombre, $password)
-
-function comprobarPorDefecto($valor)
-{
-    return ($valor == 'default' ? null : $valor);
-
-} // function comprobarPorDefecto($valor)
+} // function DBcomprobarStm($stm)
 
 function validar($aCampos, &$errores)
 {
@@ -351,13 +239,7 @@ function validar($aCampos, &$errores)
                     $errores[]  = 'El genero es obligatorio';
                 } else {
                     try {
-                        $aResultadoSQLGeneroAccion = DBexisteGeneroId($valor);
-                        $bExisteGenero             = $aResultadoSQLGeneroAccion['salida'];
-
-                        if (!$bExisteGenero){
-                            $errores[] = 'El género no es válido';
-                        } // if (!$bExisteGenero)
-
+                        $rowGeneroId = DBgeneroId($valor);
                     } catch (Exception $e){
                         $errores[] = $e->getMessage();
                     } // catch (Exception $e)
@@ -397,3 +279,9 @@ function validar($aCampos, &$errores)
     }
 
 } // function validar($aCampos)
+
+function comprobarPorDefecto($valor)
+{
+    return ($valor == 'default' ? null : $valor);
+
+} // function comprobarPorDefecto($valor)

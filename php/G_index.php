@@ -5,14 +5,9 @@ require_once 'F_DB.php';
 $tituloBuscador = trim(filter_input(INPUT_GET, 'titulo-buscador'));
 
 try {
-    $stmPeliculas = DBbuscarPeliculaTitulo($tituloBuscador, true);
+    $stmPeliculas = DBbuscadorPelicula($tituloBuscador);
 } catch (Exception $e){
     SessionMensajeModificar($e->getMessage());
-}
-
-function gTituloBuscador($tituloBuscador)
-{
-    return h($tituloBuscador);
 }
 
 function gBotonSesion()
