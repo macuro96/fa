@@ -39,7 +39,10 @@ try {
                 </div>
                 <?php
                 if (SessionExisteSesionUsuario()):?>
-                    <div class="col-lg-offset-5 col-lg-2">
+                    <div class="col-lg-offset-3 col-lg-1">
+                        <h4><?= SessionNombreUsuario() ?></h4>
+                    </div>
+                    <div class="col-lg-2">
                         <a class="btn btn-primary center-block" href="logout.php" role="button">Cerrar sesión</a>
                     </div>
                 <?php else: ?>

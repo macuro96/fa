@@ -86,6 +86,11 @@ function SessionExisteSesionUsuario()
 
 } // function SessionExisteSesionUsuario()
 
+function SessionNombreUsuario()
+{
+    return $_SESSION['Usuario']['nombre'];
+}
+
 function notificacionMensaje(){
     if (SessionExiste() && SessionMensajeExiste()): ?>    
         <div class="alert alert-warning alert-dismissible" role="alert">
