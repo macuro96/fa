@@ -1,4 +1,11 @@
 <?php
+
+/**
+* @author Manuel Cuevas Rodriguez
+* @copyright Copyright (c) 2017 Manuel Cuevas Rodriguez
+* @license https://www.gnu.org/licenses/gpl.txt
+*/
+
 require_once 'F_Session.php';
 require_once 'F_DB.php';
 

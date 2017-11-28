@@ -7,7 +7,6 @@
 */
 
 require_once 'php/F_Session.php';
-SessionCrear();
 
 try {
     SessionCerrarSesionUsuario();

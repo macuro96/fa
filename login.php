@@ -1,61 +1,4 @@
-<?php
-require_once 'php/F_Session.php';
-SessionCrear();
-
-require_once 'php/F_DB.php';
-
-$errores = array();
-
-$nombre   = trim(filter_input(INPUT_POST, 'usuario'));
-$password = trim(filter_input(INPUT_POST, 'password'));
-
-if (!empty($_POST)){
-    try {
-        validar([
-            'nombreUsuario'   => $nombre,
-            'passwordUsuario' => $password
-        ], $errores);
-
-        $rowUsuario        = DBbuscarUsuario($nombre, $password)['salida'];
-        $bPasswordCorrecto = false;
-
-        try {
-            if (!$rowUsuario){
-                throw new Exception('El nombre y/o contraseña no coincide con ningún usuario');
-            } // if (!$rowUsuario)
-
-            $passwordVerificar = $rowUsuario->password;
-            $bPasswordCorrecto = password_verify($password, $passwordVerificar);
-
-            $idUsuario = $rowUsuario->id;
-            
-            if (!$bPasswordCorrecto){
-                throw new Exception('El nombre y/o contraseña no coincide con ningún usuario');
-            } // if (!$bPasswordCorrecto)
-
-            SessionIniciarSesionUsuario($idUsuario, $nombre);
-
-            SessionMensajeModificar('Autenticación realizada con éxito');
-            header('Location: index.php');
-
-        } catch (Exception $err){
-            $errores[] = $err->getMessage();
-        }
-
-    } catch (Exception $e){
-        $mensaje = $e->getMessage();
-
-        if ($mensaje != null){
-            SessionMensajeModificar($e->getMessage());
-            header('Location: index.php');   
-
-        } // if ($mensaje != null)
-
-    } // catch (Exception $e)
-
-} // if (!empty($_POST))
-
-?>
+<?php require_once 'php/G_login.php' ?>
 <!DOCTYPE html>
 <html lang="es">
     <head>
@@ -72,8 +15,6 @@ if (!empty($_POST)){
 
     <body>
         <div class="container-fluid">
-            <?php notificacionMensaje() ?>
-
             <div class="row">
                 <div class="col-lg-offset-4 col-lg-4 page-header">
                     <h1>Login</h1>
@@ -111,16 +52,7 @@ if (!empty($_POST)){
                 </div>
             </div>
 
-            <?php
-            if (!empty($errores)):?>
-                <div class="row">
-                    <div class="col-lg-offset-4 col-lg-4">
-                        <?php foreach ($errores as $error):?>
-                            <h4><?= $error ?></h4>                        
-                        <?php endforeach; ?>
-                    </div>
-                </div>
-            <?php endif; ?>
+            <?php mostrarErrores($errores) ?>
 
         </div>
 

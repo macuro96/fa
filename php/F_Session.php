@@ -96,3 +96,9 @@ function notificacionMensaje(){
     endif;
 
 } // function notificacionMensaje()
+
+function volverIndexMensaje(Exception $e)
+{
+    SessionMensajeModificar($e->getMessage());
+    header('Location: index.php');       
+}

@@ -144,7 +144,7 @@ function DBusuario($nombre, $password)
     $stm = DBsql('SELECT * FROM '.TABLA_USUARIOS.' WHERE "nombre" = :nombre',
                  
                  'No se ha podido realizar la búsqueda del usuario',
-                 [':nombre', $nombre]);
+                 [':nombre' => $nombre]);
 
     $row = DBcomprobarStm($stm, $error);
 
