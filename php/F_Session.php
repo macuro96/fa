@@ -15,7 +15,8 @@ function SessionCrear()
 
 } // function SessionCrear()
 
-function SessionExiste(){
+function SessionExiste()
+{
     return (session_id() != '');
 
 } // function SessionExiste()
@@ -25,7 +26,7 @@ function SessionCerrar()
     if (SessionExiste()){
         session_destroy();
     } else { // 
-        throw Exception("No existe ninguna sesión para cerrar");
+        throw new Exception("No existe ninguna sesión para cerrar");
     }
 
 } // function SessionCerrar()
@@ -40,13 +41,50 @@ function SessionMensajeBorrar()
     unset($_SESSION['mensaje']);
 }
 
-function SessionMensajeExiste(){
+function SessionMensajeExiste()
+{
     return isset($_SESSION['mensaje']);
 }
 
-function SessionMensaje(){
+function SessionMensaje()
+{
     return (SessionMensajeExiste() ? $_SESSION['mensaje'] : null);
 }
+
+function SessionIniciarSesionUsuario($id, $nombre)
+{
+    $_SESSION['Usuario'] = [
+        'id'     => $id,
+        'nombre' => $nombre
+    ];
+
+} // function SessionIniciarSesionUsuario($id, $nombre)
+
+function SessionCerrarSesionUsuario()
+{
+    $_SESSION = [];
+
+    $params = session_get_cookie_params();
+
+    setcookie(
+        session_name(),         // nombre
+        '',                     // valor
+        1,                      // tiempo de expiracion
+        $params['path'],        // path
+        $params['domain'],      // domain
+        $params['secure'],      // secure
+        $params['httponly']     // httponly
+    );
+
+    SessionCerrar();
+
+} // function SessionCerrarSesionUsuario()
+
+function SessionExisteSesionUsuario()
+{
+    return (isset($_SESSION['Usuario']));
+
+} // function SessionExisteSesionUsuario()
 
 function notificacionMensaje(){
     if (SessionExiste() && SessionMensajeExiste()): ?>    
