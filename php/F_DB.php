@@ -8,9 +8,34 @@
 
 require_once 'db/CFG_DB.php';
 
+define('TABLA_PELICULAS', '"peliculas"');
+define('TABLA_GENEROS', '"generos"');
+define('TABLA_USUARIOS', '"usuarios"');
+
+define('VISTA_PELICULAS', '"viewPeliculas"');
+
 function DBconectar(){
     return new PDO(DB_DSN, DB_USUARIO, DB_PASSWORD);
 }
+
+function DBsql($sql, $error, $aCampos = []){
+    $db = DBconectar();
+
+    $stm = $db->prepare($sql);
+
+    foreach ($aCampos as $campo => $valor){
+        $stm->bindValue($campo, $valor);                
+    } // foreach ($aCampos as $campo => $valor)
+
+    $bSQL = $stm->execute();
+
+    if (!$bSQL){
+        throw new Exception($error);
+    }
+
+    return $stm;
+
+} // function DBselect($aCampos, $sFrom, $aWhere)
 
 function DBbuscarPeliculaId($id, $bVista = true)
 {
@@ -36,36 +61,22 @@ function DBbuscarPeliculaId($id, $bVista = true)
 
 function DBbuscarPeliculaTitulo($titulo, $bSipnosisCorta = false, $bExacto = false)
 {
-    $aResultado = array('success' => false, 'error' => '', 'salida' => null);
-
-    $db = DBconectar();
+    $error = 'No se ha podido buscar la película correctamente';
 
     if (!$bExacto){
         $sql = ('SELECT ' . ($bSipnosisCorta ? '"id", "titulo", "anyo", left("sipnosis", 40) AS "sipnosis", "duracion", "genero"' :  '*') . 
-                '  FROM  "viewPeliculas" WHERE "titulo" ILIKE :titulo');
+                '  FROM  '.VISTA_PELICULAS.' WHERE "titulo" ILIKE :titulo');
+        $aCampos = [':titulo' => '%'.$titulo.'%'];
 
-        $stm = $db->prepare($sql);
-        $stm->bindValue(':titulo', '%'.$titulo.'%');
-
-    } else { // if (!$bExacto)
+    } else {
         $sql = ('SELECT ' . ($bSipnosisCorta ? '"id", "titulo", "anyo", left("sipnosis", 40) AS "sipnosis", "duracion", "genero"' :  '*') . 
-                '  FROM  "viewPeliculas" WHERE "titulo" = :titulo');
-
-        $stm = $db->prepare($sql);
-        $stm->bindValue(':titulo', $titulo);
-
-    } // else (!$bExacto)
-
-    $bSelect = $stm->execute();
-
-    if (!$bSelect){
-        throw new Exception('No se ha podido buscar la película correctamente');
+                '  FROM  "viewPeliculas" WHERE "titulo" = :titulo');        
+        $aCampos = [':titulo' => $titulo];
     }
 
-    $aResultado['success'] = true;
-    $aResultado['salida']  = $stm;
+    $stm = DBsql($sql, $error, $aCampos);
 
-    return $aResultado;
+    return $stm;
 
 } // function DBbuscarPeliculaTitulo($titulo, $bExacto = true)
 

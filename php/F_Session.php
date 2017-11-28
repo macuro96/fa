@@ -8,12 +8,8 @@
 
 require_once 'F_General.php';
 
-function SessionCrear()
-{
-    session_name('fa');
-    session_start();
-
-} // function SessionCrear()
+session_name('fa');
+session_start();
 
 function SessionExiste()
 {
