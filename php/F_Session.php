@@ -8,12 +8,8 @@
 
 require_once 'F_General.php';
 
-function SessionCrear()
-{
-    session_name('fa');
-    session_start();
-
-} // function SessionCrear()
+session_name('fa');
+session_start();
 
 function SessionExiste()
 {
@@ -25,10 +21,8 @@ function SessionCerrar()
 {
     if (SessionExiste()){
         session_destroy();
-    } else { // 
-        throw new Exception("No existe ninguna sesión para cerrar");
     }
-
+    
 } // function SessionCerrar()
 
 function SessionMensajeModificar($mensaje)
@@ -102,3 +96,9 @@ function notificacionMensaje(){
     endif;
 
 } // function notificacionMensaje()
+
+function volverIndexMensaje(Exception $e)
+{
+    SessionMensajeModificar($e->getMessage());
+    header('Location: index.php');       
+}

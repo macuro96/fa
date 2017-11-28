@@ -1,27 +1,4 @@
-<?php
-require_once 'php/F_Session.php';
-SessionCrear();
-
-require_once 'php/F_DB.php';
-
-$id = trim(filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT));
-
-try {
-    $row = DBbuscarPeliculaId($id)['salida']->fetchObject();
-
-    if (!$row){
-        throw new Exception('No existe ninguna película con ese identificador');
-    }
-
-    $titulo = $row->titulo;
-
-} catch (Exception $e){
-    SessionMensajeModificar($e->getMessage());
-    header("Location: index.php");
-
-} // catch (Exception $e)
-
-?>
+<?php require_once 'php/G_borrar.php' ?>
 <!DOCTYPE html>
 <html lang="es">
     <head>

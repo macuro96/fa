@@ -33,7 +33,7 @@ CREATE TABLE "usuarios"
 
 -- Vistas
 CREATE VIEW "viewPeliculas" AS
-    SELECT P."id", P."titulo", P."sipnosis", P."anyo", P."duracion", G."nombre" as "genero" FROM "peliculas" P JOIN "generos" G ON (P."genero_id" = G."id");
+    SELECT P."id", P."titulo", P."sipnosis", P."anyo", P."duracion", P."genero_id", G."nombre" as "genero" FROM "peliculas" P JOIN "generos" G ON (P."genero_id" = G."id");
 ;
 
 -- Funciones
