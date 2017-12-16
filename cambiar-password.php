@@ -1,43 +1,36 @@
-<?php namespace php\clases; require_once 'php/load/login.php'; ?>
+<?php namespace php\clases; include_once 'php/load/cambiar-password.php'; ?>
 <!DOCTYPE html>
 <html lang="es">
     <head>
-        <?php encabezado('Login') ?>
+        <?php encabezado('Cambiar password'); ?>
     </head>
 
     <body>
         <div class="container-fluid">
             <div class="row">
                 <div class="col-lg-offset-3 col-lg-6 page-header">
-                    <h1>Login</h1>
+                    <h1>Cambiar password</h1>
                 </div>
             </div>
 
             <div class="row">
                 <div class="col-lg-offset-3 col-lg-6">
-                    <form class="form-horizontal form-login" action="login.php" method="post">
+                    <form class="form-horizontal form-login" method="post">
                         <div class="form-group">
-                            <label for="nombre" class="col-sm-2 control-label">Usuario</label>
-                            <div class="col-sm-10">
-                                <input type="text" class="form-control" id="nombre" name="nombre">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="password" class="col-sm-2 control-label">Contraseña</label>
+                            <label for="password" class="col-sm-2 control-label">Nueva contraseña</label>
                             <div class="col-sm-10">
                                 <input type="password" class="form-control" id="password" name="password">
                             </div>
                         </div>
                         <div class="form-group">
-                            <div class="col-sm-offset-2 col-sm-10">
-                                <div class="checkbox">
-                                    <label><input type="checkbox"> Recuérdame</label>
-                                </div>
+                            <label for="conf-password" class="col-sm-2 control-label">Confirmar contraseña</label>
+                            <div class="col-sm-10">
+                                <input type="password" class="form-control" id="conf-password" name="conf-password">
                             </div>
                         </div>
                         <div class="form-group">
                             <div class="col-sm-offset-2 col-sm-10">
-                                <button type="submit" class="btn btn-primary">Entrar</button>
+                                <button type="submit" class="btn btn-primary">Cambiar</button>
                             </div>
                         </div>
                     </form>
